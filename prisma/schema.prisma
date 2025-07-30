@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -19,5 +12,39 @@ model User {
   email     String
   name      String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isPremium Boolean  @default(false)
+}
+
+// TODO: Fazer relacionamentos futuros como por ex: playlists, likedSongs, etc.
+model Artist {
+  id       String  @id @default(uuid())
+  name     String
+  bio      String?
+  imageUrl String?
+
+  albums Album[]
+  songs  Song[]
+}
+
+model Album {
+  id          String   @id @default(uuid())
+  title       String
+  artistId    String
+  releaseDate DateTime
+  coverUrl    String?
+
+  artist Artist @relation(fields: [artistId], references: [id])
+  songs  Song[]
+}
+
+model Song {
+  id       String @id @default(uuid())
+  title    String
+  duration Int // em segundos
+  albumId  String
+  artistId String
+  audioUrl String
+
+  album  Album  @relation(fields: [albumId], references: [id])
+  artist Artist @relation(fields: [artistId], references: [id])
 }
