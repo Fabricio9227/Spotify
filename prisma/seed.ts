@@ -1,105 +1,115 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
-  // Usuários
-  const user1 = await prisma.user.create({
-    data: {
-      name: 'Alice',
-      email: 'alice@example.com',
-      password: 'senha123',
-      isPremium: true
-    }
-  })
+  const users = [
+    {
+      name: "João",
+      email: "joao@email.com",
+      password: "senha123",
+      isPremium: true,
+    },
+    {
+      name: "Ana",
+      email: "ana@email.com",
+      password: "123senha",
+      isPremium: false,
+    },
+  ];
 
-  const user2 = await prisma.user.create({
-    data: {
-      name: 'Bob',
-      email: 'bob@example.com',
-      password: 'seguro456',
-      isPremium: false
-    }
-  })
+  const artists = [
+    {
+      name: "Aurora Beats",
+      bio: "Som etéreo e imersivo.",
+      imageUrl: "https://utfs.io/f/aurora.jpg",
+    },
+    {
+      name: "Urban Flow",
+      bio: "O melhor do hip hop urbano.",
+      imageUrl: "https://utfs.io/f/urban.jpg",
+    },
+  ];
 
-  // Artistas
-  const artist1 = await prisma.artist.create({
-    data: {
-      name: 'Aurora Sky',
-      bio: 'Uma artista de pop alternativo',
-      imageUrl: 'https://example.com/artists/aurora.jpg'
-    }
-  })
+  const albums = [
+    {
+      title: "Ecos de Luz",
+      artistIndex: 0,
+      releaseDate: new Date("2023-06-01"),
+      coverUrl: "https://utfs.io/f/ecos.jpg",
+    },
+    {
+      title: "Ritmo da Rua",
+      artistIndex: 1,
+      releaseDate: new Date("2022-09-15"),
+      coverUrl: "https://utfs.io/f/ritmo.jpg",
+    },
+  ];
 
-  const artist2 = await prisma.artist.create({
-    data: {
-      name: 'Echo Pulse',
-      bio: 'Música eletrônica com alma',
-      imageUrl: 'https://example.com/artists/echo.jpg'
-    }
-  })
+  const songs = [
+    {
+      title: "Nascer do Sol",
+      duration: 210,
+      artistIndex: 0,
+      albumIndex: 0,
+      audioUrl: "https://utfs.io/f/sol.mp3",
+    },
+    {
+      title: "Neon Dreams",
+      duration: 198,
+      artistIndex: 0,
+      albumIndex: 0,
+      audioUrl: "https://utfs.io/f/neon.mp3",
+    },
+    {
+      title: "Batalha Final",
+      duration: 250,
+      artistIndex: 1,
+      albumIndex: 1,
+      audioUrl: "https://utfs.io/f/batalha.mp3",
+    },
+  ];
 
-  // Álbuns
-  const album1 = await prisma.album.create({
-    data: {
-      title: 'Reflexos do Amanhecer',
-      releaseDate: new Date('2022-01-01'),
-      coverUrl: 'https://example.com/albums/reflexos.jpg',
-      artistId: artist1.id
-    }
-  })
+  // Cria usuários
+  for (const user of users) {
+    await prisma.user.create({ data: { ...user, createdAt: new Date() } });
+  }
 
-  const album2 = await prisma.album.create({
-    data: {
-      title: 'Noite Digital',
-      releaseDate: new Date('2023-06-15'),
-      coverUrl: 'https://example.com/albums/noite.jpg',
-      artistId: artist2.id
-    }
-  })
+  // Cria artistas
+  const createdArtists = [];
+  for (const artist of artists) {
+    const created = await prisma.artist.create({ data: artist });
+    createdArtists.push(created);
+  }
 
-  // Músicas
-  await prisma.song.createMany({
-    data: [
-      {
-        title: 'Acordar',
-        duration: 200,
-        albumId: album1.id,
-        artistId: artist1.id,
-        audioUrl: 'https://example.com/songs/acordar.mp3'
+  // Cria álbuns
+  const createdAlbums = [];
+  for (const album of albums) {
+    const created = await prisma.album.create({
+      data: {
+        title: album.title,
+        releaseDate: album.releaseDate,
+        coverUrl: album.coverUrl,
+        artistId: createdArtists[album.artistIndex].id,
       },
-      {
-        title: 'Vento Solar',
-        duration: 180,
-        albumId: album1.id,
-        artistId: artist1.id,
-        audioUrl: 'https://example.com/songs/vento-solar.mp3'
-      },
-      {
-        title: 'Circuito',
-        duration: 210,
-        albumId: album2.id,
-        artistId: artist2.id,
-        audioUrl: 'https://example.com/songs/circuito.mp3'
-      },
-      {
-        title: 'Fluxo',
-        duration: 190,
-        albumId: album2.id,
-        artistId: artist2.id,
-        audioUrl: 'https://example.com/songs/fluxo.mp3'
-      }
-    ]
-  })
+    });
+    createdAlbums.push(created);
+  }
 
-  console.log('🌱 Banco populado com sucesso!')
+  // Cria músicas
+  for (const song of songs) {
+    await prisma.song.create({
+      data: {
+        title: song.title,
+        duration: song.duration,
+        audioUrl: song.audioUrl,
+        artistId: createdArtists[song.artistIndex].id,
+        albumId: createdAlbums[song.albumIndex].id,
+      },
+    });
+  }
 }
 
 main()
-  .catch(e => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
+  .catch(console.error)
+  .finally(() => prisma.$disconnect());
