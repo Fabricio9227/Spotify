@@ -4,13 +4,13 @@
 
 @layer base {
   .dark {
-    --background: 225 9% 9%;
+    --background: 300 3% 11%;
     --foreground: 210 40% 98%;
 
-    --card: 228 9% 11%;
+    --card: 300 3% 11%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 228 9% 11%;
+    --popover: 300 3% 11%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 252 100% 69%;
@@ -44,6 +44,6 @@
     @apply h-full;
   }
   body {
-    @apply bg-background text-foreground h-full;
+    @apply h-full bg-background text-foreground;
   }
 }
