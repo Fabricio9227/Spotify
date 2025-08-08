@@ -1,8 +1,10 @@
-import { Inter } from "next/font/google";
+import { Lato } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const lato = Lato({
   subsets: ["latin"],
+  weight: ["300", "400", "700", "900"],
+  variable: "--font-lato",
 });
 
 export const metadata = {
@@ -16,9 +18,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className={inter.className}>
-        <div className="flex-1">{children}</div>
+    <html lang="pt">
+      <body className={`dark ${lato.variable}`}>
+        <div className="flex-1 font-sans">{children}</div>
       </body>
     </html>
   );
